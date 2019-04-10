@@ -1,20 +1,28 @@
 package com.naldana.ejemplo10
 
+import android.content.Intent
+import android.os.AsyncTask
 import android.os.Bundle
 import android.support.design.widget.Snackbar
 import android.support.design.widget.NavigationView
 import android.support.v4.view.GravityCompat
 import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.app.AppCompatActivity
+import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.RecyclerView
 import android.view.Menu
 import android.view.MenuItem
+import com.naldana.ejemplo10.models.Moneda
+import com.naldana.ejemplo10.utils.NetworkUtils
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.app_bar_main.*
 import kotlinx.android.synthetic.main.content_main.*
+import org.json.JSONObject
+import java.io.IOException
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
-    var twoPane =  false
+    var twoPane = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,8 +60,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         nav_view.setNavigationItemSelectedListener(this)
 
         // TODO (20) Para saber si estamos en modo dos paneles
-        if (fragment_content != null ){
-            twoPane =  true
+        if (fragment_content != null) {
+            twoPane = true
         }
 
 
@@ -61,6 +69,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
          * TODO (Instrucciones)Luego de leer todos los comentarios añada la implementación de RecyclerViewAdapter
          * Y la obtencion de datos para el API de Monedas
          */
+
+        //llama funciones de MonedaViewer
+        FetchPokemonTask().execute("")
+        searchPokemon()
+        clearSearchPokemon()
     }
 
 
@@ -121,5 +134,146 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         // TODO (15) Cuando se da click a un opcion del menu se cierra de manera automatica
         drawer_layout.closeDrawer(GravityCompat.START)
         return true
+    }
+
+    private lateinit var viewAdapter: MonedaAdapter
+    private lateinit var viewManager: RecyclerView.LayoutManager
+
+    fun initRecycler(pokemon: MutableList<Moneda>) {
+        viewManager = LinearLayoutManager(this)
+        viewAdapter = MonedaAdapter(pokemon, { pokemonItem: Moneda -> pokemonItemClicked(pokemonItem) })
+
+        recyclerview.apply {
+            setHasFixedSize(true)
+            layoutManager = viewManager
+            adapter = viewAdapter
+        }
+    }
+
+    private fun searchPokemon() {
+        searchbarbutton.setOnClickListener {
+            if (!searchbar.text.isEmpty()) {
+                QueryPokemonTask().execute("${searchbar.text}")
+            }
+        }
+    }
+
+    private fun clearSearchPokemon() {
+        searchbarclearbutton.setOnClickListener {
+            searchbar.setText("")
+            FetchPokemonTask().execute("")
+        }
+    }
+
+    private fun pokemonItemClicked(item: Moneda) {
+        startActivity(Intent(this, MonedaViewer::class.java).putExtra("CLAVIER", item.url))
+    }
+
+    private inner class FetchPokemonTask : AsyncTask<String, Void, String>() {
+
+        override fun doInBackground(vararg query: String): String {
+
+            if (query.isNullOrEmpty()) return ""
+
+            val ID = query[0]
+            val pokeAPI = NetworkUtils.NetworkUtils().buildUrl("pokemon", ID)
+
+            return try {
+                NetworkUtils.NetworkUtils().getResponseFromHttpUrl(pokeAPI)
+            } catch (e: IOException) {
+                e.printStackTrace()
+                ""
+            }
+
+        }
+
+        override fun onPostExecute(monedaInfo: String) {
+            val moneda = if (!monedaInfo.isEmpty()) {
+                val root = JSONObject(monedaInfo)
+                val results = root.getJSONArray("results")
+                MutableList(20) { i ->
+                    val result = JSONObject(results[i].toString())
+                    Moneda(
+                        i,
+                        result.getString("name").capitalize(),
+                        R.string.n_a_value.toString(),
+                        R.string.n_a_value.toString(),
+                        R.string.n_a_value.toString(),
+                        R.string.n_a_value.toString(),
+                        result.getString("url"),
+                        R.string.n_a_value.toString()
+                    )
+                }
+            } else {
+                MutableList(20) { i ->
+                    Moneda(
+                        i,
+                        R.string.n_a_value.toString(),
+                        R.string.n_a_value.toString(),
+                        R.string.n_a_value.toString(),
+                        R.string.n_a_value.toString(),
+                        R.string.n_a_value.toString(),
+                        R.string.n_a_value.toString(),
+                        R.string.n_a_value.toString()
+                    )
+                }
+            }
+            initRecycler(moneda)
+        }
+    }
+
+    private inner class QueryPokemonTask : AsyncTask<String, Void, String>() {
+
+        override fun doInBackground(vararg query: String): String {
+
+            if (query.isNullOrEmpty()) return ""
+
+            val ID = query[0]
+            val pokeAPI = NetworkUtils.NetworkUtils().buildUrl("type", ID)
+
+            return try {
+                NetworkUtils.NetworkUtils().getResponseFromHttpUrl(pokeAPI)
+            } catch (e: IOException) {
+                e.printStackTrace()
+                ""
+            }
+
+        }
+
+        override fun onPostExecute(monedaInfo: String) {
+            val moneda = if (!monedaInfo.isEmpty()) {
+                val root = JSONObject(monedaInfo)
+                val results = root.getJSONArray("pokemon")
+                MutableList(20) { i ->
+                    val resulty = JSONObject(results[i].toString())
+                    val result = JSONObject(resulty.getString("pokemon"))
+
+                    Moneda(
+                        i,
+                        result.getString("name").capitalize(),
+                        R.string.n_a_value.toString(),
+                        R.string.n_a_value.toString(),
+                        R.string.n_a_value.toString(),
+                        R.string.n_a_value.toString(),
+                        result.getString("url"),
+                        R.string.n_a_value.toString()
+                    )
+                }
+            } else {
+                MutableList(20) { i ->
+                    Moneda(
+                        i,
+                        R.string.n_a_value.toString(),
+                        R.string.n_a_value.toString(),
+                        R.string.n_a_value.toString(),
+                        R.string.n_a_value.toString(),
+                        R.string.n_a_value.toString(),
+                        R.string.n_a_value.toString(),
+                        R.string.n_a_value.toString()
+                    )
+                }
+            }
+            initRecycler(moneda)
+        }
     }
 }
