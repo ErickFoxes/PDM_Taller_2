@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- TODO (4) Contenedor de Top-Level. Permite definir como interactuan los elementos hijos entre si -->
-<!-- TODO (4.1) Se puede definir que un elemento tenga scroll relativo a otro -->
+<?xml version="1.0" encoding="utf-8"?><!-- TODO (4) Contenedor de Top-Level. Permite definir como interactuan los elementos hijos entre si --><!-- TODO (4.1) Se puede definir que un elemento tenga scroll relativo a otro -->
 <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"

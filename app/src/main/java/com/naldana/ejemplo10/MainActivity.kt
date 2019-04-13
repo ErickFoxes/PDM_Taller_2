@@ -71,9 +71,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
          */
 
         //llama funciones de MonedaViewer
-        FetchPokemonTask().execute("")
-        searchPokemon()
-        clearSearchPokemon()
+        FetchMonedaTask().execute("")
+        searchMoneda()
+        clearSearchMoneda()
     }
 
 
@@ -139,9 +139,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private lateinit var viewAdapter: MonedaAdapter
     private lateinit var viewManager: RecyclerView.LayoutManager
 
-    fun initRecycler(pokemon: MutableList<Moneda>) {
+    fun initRecycler(moneda: MutableList<Moneda>) {
         viewManager = LinearLayoutManager(this)
-        viewAdapter = MonedaAdapter(pokemon, { pokemonItem: Moneda -> pokemonItemClicked(pokemonItem) })
+        viewAdapter = MonedaAdapter(moneda, { monedaItem: Moneda -> monedaItemClicked(monedaItem) })
 
         recyclerview.apply {
             setHasFixedSize(true)
@@ -150,36 +150,36 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
     }
 
-    private fun searchPokemon() {
+    private fun searchMoneda() {
         searchbarbutton.setOnClickListener {
             if (!searchbar.text.isEmpty()) {
-                QueryPokemonTask().execute("${searchbar.text}")
+                QueryMonedaTask().execute("${searchbar.text}")
             }
         }
     }
 
-    private fun clearSearchPokemon() {
+    private fun clearSearchMoneda() {
         searchbarclearbutton.setOnClickListener {
             searchbar.setText("")
-            FetchPokemonTask().execute("")
+            FetchMonedaTask().execute("")
         }
     }
 
-    private fun pokemonItemClicked(item: Moneda) {
-        startActivity(Intent(this, MonedaViewer::class.java).putExtra("CLAVIER", item.url))
+    private fun monedaItemClicked(item: Moneda) {
+        startActivity(Intent(this, MonedaViewer::class.java).putExtra("CLAVIER", item.value))
     }
 
-    private inner class FetchPokemonTask : AsyncTask<String, Void, String>() {
+    private inner class FetchMonedaTask : AsyncTask<String, Void, String>() {
 
         override fun doInBackground(vararg query: String): String {
 
             if (query.isNullOrEmpty()) return ""
 
             val ID = query[0]
-            val pokeAPI = NetworkUtils.NetworkUtils().buildUrl("pokemon", ID)
+            val monedaAPI = NetworkUtils.NetworkUtils().buildUrl("", "")
 
             return try {
-                NetworkUtils.NetworkUtils().getResponseFromHttpUrl(pokeAPI)
+                NetworkUtils.NetworkUtils().getResponseFromHttpUrl(monedaAPI)
             } catch (e: IOException) {
                 e.printStackTrace()
                 ""
@@ -190,30 +190,33 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         override fun onPostExecute(monedaInfo: String) {
             val moneda = if (!monedaInfo.isEmpty()) {
                 val root = JSONObject(monedaInfo)
-                val results = root.getJSONArray("results")
-                MutableList(20) { i ->
+                val results = root.getJSONArray("post")
+                val resultlength = results.length()
+                MutableList(resultlength) { i ->
                     val result = JSONObject(results[i].toString())
                     Moneda(
-                        i,
+                        result.getString("_id"),
                         result.getString("name").capitalize(),
-                        R.string.n_a_value.toString(),
-                        R.string.n_a_value.toString(),
-                        R.string.n_a_value.toString(),
-                        R.string.n_a_value.toString(),
-                        result.getString("url"),
-                        R.string.n_a_value.toString()
+                        result.getString("country"),
+                        result.getInt("value"),
+                        result.getInt("value_us"),
+                        result.getInt("year"),
+                        result.getString("review"),
+                        result.getBoolean("isAvailable"),
+                        result.getString("image")
                     )
                 }
             } else {
                 MutableList(20) { i ->
                     Moneda(
-                        i,
                         R.string.n_a_value.toString(),
                         R.string.n_a_value.toString(),
                         R.string.n_a_value.toString(),
+                        R.integer.int_cero,
+                        R.integer.int_cero,
+                        R.integer.int_cero,
                         R.string.n_a_value.toString(),
-                        R.string.n_a_value.toString(),
-                        R.string.n_a_value.toString(),
+                        true,
                         R.string.n_a_value.toString()
                     )
                 }
@@ -222,17 +225,17 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
     }
 
-    private inner class QueryPokemonTask : AsyncTask<String, Void, String>() {
+    private inner class QueryMonedaTask : AsyncTask<String, Void, String>() {
 
         override fun doInBackground(vararg query: String): String {
 
             if (query.isNullOrEmpty()) return ""
 
             val ID = query[0]
-            val pokeAPI = NetworkUtils.NetworkUtils().buildUrl("type", ID)
+            val monedaAPI = NetworkUtils.NetworkUtils().buildUrl("name", ID)
 
             return try {
-                NetworkUtils.NetworkUtils().getResponseFromHttpUrl(pokeAPI)
+                NetworkUtils.NetworkUtils().getResponseFromHttpUrl(monedaAPI)
             } catch (e: IOException) {
                 e.printStackTrace()
                 ""
@@ -243,32 +246,32 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         override fun onPostExecute(monedaInfo: String) {
             val moneda = if (!monedaInfo.isEmpty()) {
                 val root = JSONObject(monedaInfo)
-                val results = root.getJSONArray("pokemon")
-                MutableList(20) { i ->
-                    val resulty = JSONObject(results[i].toString())
-                    val result = JSONObject(resulty.getString("pokemon"))
-
+                val results = root.getJSONArray("post")
+                MutableList(results.length()) { i ->
+                    val result = JSONObject(results[i].toString())
                     Moneda(
-                        i,
+                        result.getString("_id"),
                         result.getString("name").capitalize(),
-                        R.string.n_a_value.toString(),
-                        R.string.n_a_value.toString(),
-                        R.string.n_a_value.toString(),
-                        R.string.n_a_value.toString(),
-                        result.getString("url"),
-                        R.string.n_a_value.toString()
+                        result.getString("country"),
+                        result.getInt("value"),
+                        result.getInt("value_us"),
+                        result.getInt("year"),
+                        result.getString("review"),
+                        result.getBoolean("isAvailable"),
+                        result.getString("image")
                     )
                 }
             } else {
                 MutableList(20) { i ->
                     Moneda(
-                        i,
                         R.string.n_a_value.toString(),
                         R.string.n_a_value.toString(),
                         R.string.n_a_value.toString(),
+                        R.integer.int_cero,
+                        R.integer.int_cero,
+                        R.integer.int_cero,
                         R.string.n_a_value.toString(),
-                        R.string.n_a_value.toString(),
-                        R.string.n_a_value.toString(),
+                        true,
                         R.string.n_a_value.toString()
                     )
                 }
@@ -277,3 +280,4 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
     }
 }
+

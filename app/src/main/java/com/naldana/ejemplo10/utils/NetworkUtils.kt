@@ -11,17 +11,14 @@ import java.util.*
 class NetworkUtils {
 
     class NetworkUtils {
-        val MONEDA_API_BASE_URL = "https://pokeapi.co/api/v2/"
-        val MONEDA_INFO = "moneda"
-        val MONEDA_TYPE = "type"
-
+        val MONEDA_API_BASE_URL = "https://coins-api-pdm-taller.herokuapp.com/api/coin"
         private val TAG = NetworkUtils::class.java.simpleName
 
-        fun buildUrl(root: String, pokeID: String): URL {
+        fun buildUrl(root: String, monedaID: String): URL {
             val builtUri = Uri.parse(MONEDA_API_BASE_URL)
                 .buildUpon()
                 .appendPath(root)
-                .appendPath(pokeID)
+                .appendPath(monedaID)
                 .build()
 
             val url = try {
