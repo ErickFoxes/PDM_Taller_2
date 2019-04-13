@@ -26,4 +26,6 @@ class MonedaAdapter (val items: List<Moneda>, val clickListener: (Moneda) -> Uni
             this.setOnClickListener { clickListener(item) }
         }
     }
+
+    //holis
 }
