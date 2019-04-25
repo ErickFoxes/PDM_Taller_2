@@ -21,7 +21,7 @@ class MonedaViewer : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.viewer_element_moneda)
 
-        val uri:String = this.intent.extras.getString("CLAVIER")
+        val uri: String = this.intent.extras.getString("CLAVIER")
         setSupportActionBar(toolbarviewer)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setDisplayShowHomeEnabled(true)
@@ -29,37 +29,40 @@ class MonedaViewer : AppCompatActivity() {
         collapsingtoolbarviewer.setCollapsedTitleTextAppearance(R.style.CollapsedAppBar)
     }
 
-    fun init(moneda: Moneda){
+    fun init(moneda: Moneda) {
         Picasso.with(this)
-            .load(moneda.sprite)
-            .resize((this.resources.displayMetrics.widthPixels/this.resources.displayMetrics.density).toInt(), 256)
+            .load(moneda.image)
+            .resize((this.resources.displayMetrics.widthPixels / this.resources.displayMetrics.density).toInt(), 256)
             .centerCrop()
             .error(R.drawable.ic_pokemon_go)
             .into(app_bar_image_viewer)
         collapsingtoolbarviewer.title = moneda.name
-        weight.text = moneda.weight
-        height.text = moneda.height
-        fstType.text = moneda.fsttype
-        sndType.text = moneda.sndtype
+        value.text = moneda.value.toString()
+        value_us.text = moneda.value_us.toString()
+        year.text = moneda.year.toString()
+        review.text = moneda.review
+
     }
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        return when(item!!.itemId){
-            android.R.id.home -> {onBackPressed();true}
+        return when (item!!.itemId) {
+            android.R.id.home -> {
+                onBackPressed();true
+            }
             else -> super.onOptionsItemSelected(item)
         }
     }
 
-    private inner class FetchMonedaTask : AsyncTask<String, Void, String>(){
+    private inner class FetchMonedaTask : AsyncTask<String, Void, String>() {
 
-        override fun doInBackground(vararg query: String) : String {
+        override fun doInBackground(vararg query: String): String {
 
             if (query.isNullOrEmpty()) return ""
 
             val url = query[0]
-            val pokeAPI = Uri.parse(url).buildUpon().build()
+            val monedaAPI = Uri.parse(url).buildUpon().build()
             val finalurl = try {
-                URL(pokeAPI.toString())
+                URL(monedaAPI.toString())
             } catch (e: MalformedURLException) {
                 URL("")
             }
@@ -72,26 +75,40 @@ class MonedaViewer : AppCompatActivity() {
             }
         }
 
-        override fun onPostExecute(monedaInfo: String){
-            val moneda = if (!monedaInfo.isEmpty()){
+        override fun onPostExecute(monedaInfo: String) {
+            val moneda = if (!monedaInfo.isEmpty()) {
                 val root = JSONObject(monedaInfo)
-                val sprites = root.getString("sprites")
-                val types = root.getJSONArray("types")
-                val fsttype = JSONObject(types[0].toString()).getString("type")
-                val sndtype = try { JSONObject(types[1].toString()).getString("type")} catch (e: JSONException) { "" }
+                val results = root.getJSONArray("post")
+                val result = JSONObject(results[0].toString())
 
-                Moneda(root.getInt("id"),
-                    root.getString("name").capitalize(),
-                    JSONObject(fsttype).getString("name").capitalize(),
-                    if(sndtype.isEmpty()) " " else JSONObject(sndtype).getString("name").capitalize(),
-                    root.getString("weight"), root.getString("height"),
-                    root.getString("location_area_encounters"),
-                    JSONObject(sprites).getString("front_default"))
+                Moneda(
+                    result.getString("id"),
+                    result.getString("name").capitalize(),
+                    result.getString("country"),
+                    result.getInt("value"),
+                    result.getInt("value_us"),
+                    result.getInt("year"),
+                    result.getString("review"),
+                    result.getBoolean("isAvailable"),
+                    result.getString("image")
+
+                )
             } else {
-                Moneda(0,R.string.n_a_value.toString(),R.string.n_a_value.toString(), R.string.n_a_value.toString(),R.string.n_a_value.toString(), R.string.n_a_value.toString(), R.string.n_a_value.toString(), R.string.n_a_value.toString())
+                Moneda(
+                    R.string.n_a_value.toString(),
+                    R.string.n_a_value.toString(),
+                    R.string.n_a_value.toString(),
+                    R.integer.int_cero,
+                    R.integer.int_cero,
+                    R.integer.int_cero,
+                    R.string.n_a_value.toString(),
+                    false,
+                    R.string.n_a_value.toString()
+                )
             }
             init(moneda)
         }
     }
 
 }
+

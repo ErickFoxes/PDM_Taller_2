@@ -11,17 +11,13 @@ import java.util.*
 class NetworkUtils {
 
     class NetworkUtils {
-        val MONEDA_API_BASE_URL = "https://pokeapi.co/api/v2/"
-        val MONEDA_INFO = "moneda"
-        val MONEDA_TYPE = "type"
-
+        val MONEDA_API_BASE_URL = "https://coins-api-pdm-taller.herokuapp.com/api"
         private val TAG = NetworkUtils::class.java.simpleName
 
-        fun buildUrl(root: String, pokeID: String): URL {
+        fun buildUrl(monedaID: String): URL {
             val builtUri = Uri.parse(MONEDA_API_BASE_URL)
                 .buildUpon()
-                .appendPath(root)
-                .appendPath(pokeID)
+                .appendPath(monedaID)
                 .build()
 
             val url = try {
@@ -38,6 +34,8 @@ class NetworkUtils {
         @Throws(IOException::class)
         fun getResponseFromHttpUrl(url: URL): String {
             val urlConnection = url.openConnection() as HttpURLConnection
+
+            urlConnection.setRequestProperty("Authorization","Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI1Y2MxYmRiODE5MmE3ODAwMTc5ODkxMDgiLCJpYXQiOjE1NTYyMDA4ODgsImV4cCI6MTYxODQwODg4OH0.81iz-UEzZSRnH_NS9DYcXrrKpYT6-nVFQHxmIxcLm3I")
             try {
                 val `in` = urlConnection.inputStream
 
