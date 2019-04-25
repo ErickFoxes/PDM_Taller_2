@@ -1,4 +1,4 @@
-package com.naldana.ejemplo10
+package com.naldana.ejemplo10.data
 
 import android.provider.BaseColumns
 
