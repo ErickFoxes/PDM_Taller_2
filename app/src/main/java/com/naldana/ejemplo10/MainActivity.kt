@@ -10,6 +10,7 @@ import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import com.naldana.ejemplo10.models.Moneda
@@ -173,10 +174,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         override fun doInBackground(vararg query: String): String {
 
-            if (query.isNullOrEmpty()) return ""
-
             val ID = query[0]
-            val monedaAPI = NetworkUtils.NetworkUtils().buildUrl("", "")
+            val monedaAPI = NetworkUtils.NetworkUtils().buildUrl("coin")
 
             return try {
                 NetworkUtils.NetworkUtils().getResponseFromHttpUrl(monedaAPI)
@@ -189,39 +188,12 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         override fun onPostExecute(monedaInfo: String) {
             val moneda = if (!monedaInfo.isEmpty()) {
-                val root = JSONObject(monedaInfo)
-                val results = root.getJSONArray("post")
-                val resultlength = results.length()
-                MutableList(resultlength) { i ->
-                    val result = JSONObject(results[i].toString())
-                    Moneda(
-                        result.getString("_id"),
-                        result.getString("name").capitalize(),
-                        result.getString("country"),
-                        result.getInt("value"),
-                        result.getInt("value_us"),
-                        result.getInt("year"),
-                        result.getString("review"),
-                        result.getBoolean("isAvailable"),
-                        result.getString("image")
-                    )
-                }
+                Log.d("Datos ... FecthMoneda",monedaInfo)
+
             } else {
-                MutableList(20) { i ->
-                    Moneda(
-                        R.string.n_a_value.toString(),
-                        R.string.n_a_value.toString(),
-                        R.string.n_a_value.toString(),
-                        R.integer.int_cero,
-                        R.integer.int_cero,
-                        R.integer.int_cero,
-                        R.string.n_a_value.toString(),
-                        true,
-                        R.string.n_a_value.toString()
-                    )
-                }
+
             }
-            initRecycler(moneda)
+           // initRecycler(moneda)
         }
     }
 
@@ -232,7 +204,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             if (query.isNullOrEmpty()) return ""
 
             val ID = query[0]
-            val monedaAPI = NetworkUtils.NetworkUtils().buildUrl("name", ID)
+            val monedaAPI = NetworkUtils.NetworkUtils().buildUrl("coin")
 
             return try {
                 NetworkUtils.NetworkUtils().getResponseFromHttpUrl(monedaAPI)
@@ -245,6 +217,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         override fun onPostExecute(monedaInfo: String) {
             val moneda = if (!monedaInfo.isEmpty()) {
+                Log.d("DATOS", monedaInfo)
                 val root = JSONObject(monedaInfo)
                 val results = root.getJSONArray("post")
                 MutableList(results.length()) { i ->
