@@ -220,7 +220,12 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         .show()
                 }
             } else {
-
+                Snackbar.make(
+                    recyclerview,
+                    "Error no se pueden obtener los datosxd",
+                    Snackbar.LENGTH_LONG
+                )
+                    .show()
             }
             // initRecycler(moneda)
         }
