@@ -180,20 +180,49 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             return try {
                 NetworkUtils.NetworkUtils().getResponseFromHttpUrl(monedaAPI)
             } catch (e: IOException) {
-                e.printStackTrace()
                 ""
             }
 
         }
 
         override fun onPostExecute(monedaInfo: String) {
-            val moneda = if (!monedaInfo.isEmpty()) {
-                Log.d("Datos ... FecthMoneda",monedaInfo)
+            super.onPostExecute(monedaInfo)
+            if (!monedaInfo.isEmpty()) {
+                val resultJSON = JSONObject(monedaInfo)
+                if (resultJSON.getBoolean("ok")) {
 
+
+                    val monedasJSON = resultJSON.getJSONArray("posts")
+
+                    var monedas = MutableList(monedasJSON.length()) {
+                        with(monedasJSON.getJSONObject(it)) {
+                            Moneda(
+                                getString("_id"),
+                                getString("name"), getString("country"),
+                                getInt("value"),
+                                getInt("value_us"), getInt("year"),
+                                getString("review"),
+                                getBoolean("isAvailable"),
+                                getString("image")
+                            )
+                        }
+
+                    }
+
+                    initRecycler(monedas)
+
+                } else {
+                    Snackbar.make(
+                        recyclerview,
+                        "Error en el servidor, no se pueden obtener los datos",
+                        Snackbar.LENGTH_LONG
+                    )
+                        .show()
+                }
             } else {
 
             }
-           // initRecycler(moneda)
+            // initRecycler(moneda)
         }
     }
 
