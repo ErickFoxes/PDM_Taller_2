@@ -1,3 +1,5 @@
+package com.naldana.ejemplo10
+
 import android.provider.BaseColumns
 
 object DatabaseContract {
