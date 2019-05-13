@@ -17,7 +17,7 @@ class MonedaAdapter(val items: List<Moneda>, val clickListener: (Moneda) -> Unit
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) = holder.bind(items[position], clickListener)
 
-
+    //lo que se muestra en el recyclerview
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         fun bind(item: Moneda, clickListener: (Moneda) -> Unit) = with(itemView) {
             tv_moneda_id.text = item.id.toString()
