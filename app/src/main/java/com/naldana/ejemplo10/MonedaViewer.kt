@@ -21,7 +21,7 @@ class MonedaViewer : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.viewer_element_moneda)
 
-        val uri: String = this.intent.extras.getString("CLAVIER")
+        //val uri: String = this.intent.extras.getString("CLAVIER")
         setSupportActionBar(toolbarviewer)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setDisplayShowHomeEnabled(true)
