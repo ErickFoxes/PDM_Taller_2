@@ -4,10 +4,12 @@ import android.net.Uri
 import android.os.AsyncTask
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.support.design.widget.Snackbar
 import android.view.MenuItem
 import com.naldana.ejemplo10.models.Moneda
 import com.naldana.ejemplo10.utils.NetworkUtils
 import com.squareup.picasso.Picasso
+import kotlinx.android.synthetic.main.content_main.*
 import kotlinx.android.synthetic.main.viewer_element_moneda.*
 import org.json.JSONException
 import org.json.JSONObject
@@ -75,6 +77,7 @@ class MonedaViewer : AppCompatActivity() {
             }
         }
 
+
         override fun onPostExecute(monedaInfo: String) {
             val moneda = if (!monedaInfo.isEmpty()) {
                 val root = JSONObject(monedaInfo)
@@ -108,6 +111,8 @@ class MonedaViewer : AppCompatActivity() {
             }
             init(moneda)
         }
+
+
     }
 
 }
